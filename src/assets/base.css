@@ -1,18 +1,25 @@
 /* Design System Variables */
 :root {
-  /* Colors */
-  --color-background: #f0eadd; /* Darker warm paper / Parchment */
-  --color-surface: #fdfbf7; /* Lighter surface for contrast */
-  --color-text-primary: #1a252f; /* Deep Ink */
-  --color-text-secondary: #586069; 
-  --color-accent: #8e44ad; /* Deep Purple / Royal - More "Literary" than red? Or maybe keep red? Let's try deep red/burgundy */
-  --color-accent-warm: #c0392b; /* Returning to Burgundy/Wax Seal Red - it fits libraries well */
-  --color-border: #dcd6cc;
-  --color-shadow: rgba(26, 37, 47, 0.08);
+  /* Colors - Dark Fantasy / Mystic Library */
+  --color-background: #0b0f19; /* Very dark blue/black */
+  --color-background-image: url('https://images.unsplash.com/photo-1507842217343-583bb7260b66?q=80&w=2600'); /* Global fallback or specific usage */
+  
+  --color-surface: rgba(20, 25, 35, 0.82); /* Semi-transparent dark card */
+  --color-surface-hover: rgba(30, 39, 54, 0.9);
+  
+  --color-text-primary: #e2e8f0; /* Light silver/grey */
+  --color-text-secondary: #94a3b8; /* Muted cool grey */
+  
+  --color-accent: #d4af37; /* Metallic Gold for highlights */
+  --color-accent-glow: rgba(212, 175, 55, 0.3);
+  --color-secondary-accent: #8e44ad; /* Deep mysticism purple */
+  
+  --color-border: rgba(255, 255, 255, 0.1);
+  --color-shadow: rgba(0, 0, 0, 0.5);
 
   /* Typography */
-  --font-heading: 'Playfair Display', serif;
-  --font-body: 'Inter', sans-serif;
+  --font-heading: 'Cinzel', serif; /* Switching to Cinzel for more fantasy vibe if available, or keep Playfair */
+  --font-body: 'Lato', sans-serif;
 
   /* Spacing */
   --spacing-xs: 0.5rem;
@@ -23,9 +30,12 @@
 
   /* Border Radius */
   --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
 }
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
 
 /* Reset & Base Styles */
 *,
@@ -39,30 +49,35 @@
 html {
   font-size: 16px;
   scroll-behavior: smooth;
+  scrollbar-gutter: stable; /* Fixes layout shift */
 }
 
 body {
   font-family: var(--font-body);
   background-color: var(--color-background);
-  /* Adding a subtle texture or vignette via gradient */
-  background-image: radial-gradient(circle at center, #f0eadd 0%, #e6dfcf 100%);
   color: var(--color-text-primary);
   line-height: 1.6;
   min-height: 100vh;
+  /* Ensure background covers everything */
+  margin: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
-  font-weight: 700;
+  font-weight: 700; /* Cinzel works well with 700 */
   line-height: 1.2;
   margin-bottom: var(--spacing-sm);
   color: var(--color-text-primary);
+  letter-spacing: 0.05em;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
 a {
   text-decoration: none;
   color: inherit;
-  transition: color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 ul {

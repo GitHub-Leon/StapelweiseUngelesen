@@ -7,10 +7,10 @@
       <div class="about-content">
         <h1>Über mich</h1>
         <p class="intro">
-          Hallo, ich bin Emma. Willkommen bei Stapelweise Ungelesen.
+          Willkommen bei Stapelweise Ungelesen!
         </p>
         <p>
-          Ich war schon immer von Bücherstapeln umgeben – einige gelesen, viele warten geduldig. Dieser Blog ist meine Art, diese Reise zu dokumentieren, meine Gedanken zu den Seiten zu teilen, die mich bewegen, und dich vielleicht dazu zu ermutigen, etwas Neues in die Hand zu nehmen.
+          Ich war schon immer von Bücherstapeln umgeben. Einige gelesen, viele warten geduldig. Dieser Blog ist meine Art, diese Reise zu dokumentieren, meine Gedanken zu den Seiten zu teilen, die mich bewegen, und dich vielleicht dazu zu ermutigen, etwas Neues in die Hand zu nehmen.
         </p>
         <p>
           Hier findest du Rezensionen, literarische Streifzüge und einen Katalog meines Leselebens.

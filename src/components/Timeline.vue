@@ -9,16 +9,14 @@ const props = defineProps({
   }
 })
 
-// Group posts by Year-Month
 const groupedPosts = computed(() => {
   const groups = {}
   
-  // Sort by date descending first just in case
   const sorted = [...props.posts].sort((a, b) => new Date(b.date) - new Date(a.date))
 
   sorted.forEach(post => {
     const date = new Date(post.date)
-    const key = `${date.getFullYear()}-${date.getMonth()}` // e.g. "2023-9" (October is 9)
+    const key = `${date.getFullYear()}-${date.getMonth()}` 
     
     if (!groups[key]) {
       groups[key] = {
@@ -29,11 +27,6 @@ const groupedPosts = computed(() => {
     groups[key].posts.push(post)
   })
 
-  // Return as array for easy iteration (since object keys might not be ordered)
-  // We want newest first, which we likely preserved if we iterate consistently,
-  // but let's be safe and map the known keys from our sorted list logic or just Object.values
-  // Since we sorted input, insertion order into object usually preserves key order in modern JS for strings...
-  // but safer to rebuild:
   return Object.values(groups)
 })
 </script>
@@ -61,48 +54,48 @@ const groupedPosts = computed(() => {
 .timeline-container {
   position: relative;
   max-width: 1000px;
-  margin: 0 auto; /* Centered */
+  margin: 0 auto;
   padding: var(--spacing-lg) var(--spacing-md);
 }
 
-/* The vertical line */
 .timeline-line {
   position: absolute;
   left: 50%;
   top: 0;
   bottom: 0;
   width: 2px;
-  background-color: var(--color-border);
+  /* Gold/Mystic Gradient Line */
+  background: linear-gradient(to bottom, transparent, var(--color-accent), transparent);
   transform: translateX(-50%);
   z-index: 0;
+  opacity: 0.5;
 }
 
 .timeline-group {
   position: relative;
   margin-bottom: var(--spacing-xl);
-  z-index: 1; /* Above line */
+  z-index: 1; 
 }
 
-/* Month marker on the line */
 .month-marker {
   display: inline-block;
-  background-color: var(--color-background);
-  border: 2px solid var(--color-accent);
+  background-color: var(--color-background); /* Matches bg to cover line behind it effectively if needed */
+  border: 1px solid var(--color-accent);
   color: var(--color-accent);
-  padding: 4px 16px;
-  border-radius: 20px;
+  padding: 6px 20px;
+  border-radius: 4px; /* More angular/parchment like */
   font-family: var(--font-heading);
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   
-  /* Centering */
-  position: relative; /* In flow of group, but let's just margin auto it */
+  position: relative; 
   left: 50%;
   transform: translateX(-50%);
   margin-bottom: var(--spacing-lg);
   
-  /* Visual tweaks */
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
 }
 
 .items-list {
@@ -111,17 +104,16 @@ const groupedPosts = computed(() => {
   gap: var(--spacing-lg);
 }
 
-/* Mobile Responsiveness */
 @media (max-width: 768px) {
   .timeline-line {
-    left: 20px; /* Shift line to left */
+    left: 20px;
     transform: none;
   }
   
   .month-marker {
     left: 20px;
-    transform: none; /* Align to left too, or keep centered? Left is better for vertical flow */
-    margin-left: 20px; /* Offset from line */
+    transform: none;
+    margin-left: 20px;
   }
 }
 </style>

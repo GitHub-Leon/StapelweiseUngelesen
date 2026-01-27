@@ -16,10 +16,8 @@ const props = defineProps({
 
 <template>
   <div class="timeline-item-wrapper" :class="side">
-    <!-- The dot on the timeline -->
     <div class="timeline-dot"></div>
     
-    <!-- The content (card) -->
     <RouterLink :to="{ name: 'post', params: { id: post.id } }" class="item-content">
       <BookCard :book="post" />
     </RouterLink>
@@ -31,60 +29,55 @@ const props = defineProps({
   display: flex;
   position: relative;
   width: 50%;
-  padding: 0 var(--spacing-lg); /* Space from center line */
+  padding: 0 var(--spacing-lg); 
 }
 
-/* Left side alignment */
 .timeline-item-wrapper.left {
   align-self: flex-start;
-  justify-content: flex-end; /* Content pushes against center */
+  justify-content: flex-end; 
   text-align: right;
-  /* Since width is 50%, left defaults to left side of container */
 }
 
-/* Right side alignment */
 .timeline-item-wrapper.right {
   align-self: flex-end;
   justify-content: flex-start;
-  margin-left: 50%; /* Push to right half */
+  margin-left: 50%; 
   text-align: left;
 }
 
 .item-content {
   width: 100%;
   max-width: 400px;
-  text-decoration: none; /* Remove link underline */
+  text-decoration: none; 
   color: inherit;
-  display: block; /* Important for component inside */
+  display: block; 
 }
 
-/* The Dot */
 .timeline-dot {
   position: absolute;
-  top: 20px; /* Adjust based on card visual center roughly or top align */
-  width: 16px;
-  height: 16px;
+  top: 20px; 
+  width: 12px;
+  height: 12px;
   background-color: var(--color-background);
-  border: 3px solid var(--color-text-secondary);
-  border-radius: 50%;
+  border: 2px solid var(--color-accent); /* Gold border */
+  box-shadow: 0 0 10px var(--color-accent); /* Glowing dot */
+  transform: rotate(45deg); /* Diamond shape for fantasy feel */
   z-index: 2;
 }
 
-/* Positioning the dot */
 .timeline-item-wrapper.left .timeline-dot {
-  right: -8px; /* Half of width (16/2 = 8) to center on line */
+  right: -6px; /* Half of 12 */
 }
 
 .timeline-item-wrapper.right .timeline-dot {
-  left: -8px;
+  left: -6px;
 }
 
-/* Mobile Responsiveness */
 @media (max-width: 768px) {
   .timeline-item-wrapper {
     width: 100%;
-    margin-left: 0 !important; /* Reset potential right margin */
-    padding-left: 50px; /* Make space for line on left */
+    margin-left: 0 !important; 
+    padding-left: 50px; 
     padding-right: 0;
     align-self: flex-start;
     justify-content: flex-start;
@@ -92,7 +85,7 @@ const props = defineProps({
   }
   
   .timeline-dot {
-    left: 12px !important; /* Align with new line position */
+    left: 14px !important; 
     right: auto !important; 
   }
 }

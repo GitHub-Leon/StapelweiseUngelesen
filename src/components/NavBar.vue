@@ -18,29 +18,43 @@ import { RouterLink } from 'vue-router'
 
 <style scoped>
 .navbar {
-  background-color: var(--color-background);
+  /* Semi-transparent dark background (glassmorphism) */
+  background-color: rgba(11, 15, 25, 0.85); /* Matches new dark theme */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--color-border);
   position: sticky;
   top: 0;
   z-index: 100;
   padding: var(--spacing-sm) 0;
-  box-shadow: 0 2px 4px var(--color-shadow);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
 .navbar-container {
-  max-width: 1200px; /* Or a variable if defined */
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 var(--spacing-md);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  min-height: 60px; /* Force consistent height */
+}
+
+@media (max-width: 768px) {
+  .navbar-container {
+      flex-direction: column;
+      gap: 1rem;
+      padding: 0.5rem var(--spacing-md); /* Reduced padding */
+      min-height: auto;
+  }
 }
 
 .logo a {
   font-family: var(--font-heading);
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--color-text-primary);
+  color: var(--color-accent); /* Gold logo */
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
 }
 
 .nav-links {
@@ -49,26 +63,31 @@ import { RouterLink } from 'vue-router'
 }
 
 .nav-link {
-  font-family: var(--font-body);
-  font-weight: 500;
+  font-family: var(--font-heading); /* Mystic font */
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  font-weight: 700;
   color: var(--color-text-secondary);
   position: relative;
+  text-transform: uppercase;
 }
 
 .nav-link:hover,
 .nav-link.router-link-active {
-  color: var(--color-accent);
+  color: var(--color-text-primary);
 }
 
 .nav-link::after {
   content: '';
   position: absolute;
   width: 0;
-  height: 2px;
+  height: 1px;
   bottom: -4px;
-  left: 0;
+  left: 50%;
+  transform: translateX(-50%);
   background-color: var(--color-accent);
   transition: width 0.3s ease;
+  box-shadow: 0 0 5px var(--color-accent);
 }
 
 .nav-link:hover::after,
