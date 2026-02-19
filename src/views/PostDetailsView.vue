@@ -100,7 +100,9 @@ const fetchRemoteLikes = async () => {
   })
 
   try {
-    const response = await fetch(`${REACTIONS_ENDPOINT}?${params.toString()}`)
+    const response = await fetch(`${REACTIONS_ENDPOINT}?${params.toString()}`, {
+      cache: 'no-store',
+    })
     if (!response.ok) throw new Error(`HTTP ${response.status}`)
 
     const data = await response.json()
@@ -129,6 +131,7 @@ const syncLike = async (nextLiked) => {
   try {
     const response = await fetch(REACTIONS_ENDPOINT, {
       method: 'POST',
+      cache: 'no-store',
       headers: {
         'Content-Type': 'application/json',
       },

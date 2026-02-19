@@ -7,6 +7,7 @@ const jsonResponse = (statusCode, payload) => ({
   headers: {
     'Content-Type': 'application/json; charset=utf-8',
     'Cache-Control': 'no-store',
+    'Netlify-CDN-Cache-Control': 'no-cache',
   },
   body: JSON.stringify(payload),
 })
@@ -20,6 +21,8 @@ const toSafeCount = (value, fallback = 0) => {
 }
 
 const getCountsKey = (postId) => `post:${postId}:counts`
+const resolveBaseLikes = (storedLikes, fallbackLikes) =>
+  Math.max(toSafeCount(storedLikes, 0), toSafeCount(fallbackLikes, 0))
 
 export const handler = async (event) => {
   try {
@@ -41,7 +44,7 @@ export const handler = async (event) => {
       const key = getCountsKey(postId)
       const existingCounts = await store.get(key, { type: 'json' })
 
-      const likes = toSafeCount(existingCounts?.likes, fallbackLikes)
+      const likes = resolveBaseLikes(existingCounts?.likes, fallbackLikes)
 
       if (!existingCounts) {
         await store.setJSON(key, { likes })
@@ -72,7 +75,7 @@ export const handler = async (event) => {
 
       const key = getCountsKey(postId)
       const existingCounts = await store.get(key, { type: 'json' })
-      let likes = toSafeCount(existingCounts?.likes, fallbackLikes)
+      let likes = resolveBaseLikes(existingCounts?.likes, fallbackLikes)
 
       if (previousLiked !== nextLiked) {
         likes += nextLiked ? 1 : -1

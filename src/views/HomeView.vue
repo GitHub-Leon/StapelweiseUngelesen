@@ -22,10 +22,12 @@ import backgroundImage from '@/assets/Hintergrund.webp'
 .home-view {
   min-height: 100vh;
   position: relative;
+  isolation: isolate;
+  overflow: clip;
 }
 
 .background-image {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
@@ -33,24 +35,25 @@ import backgroundImage from '@/assets/Hintergrund.webp'
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  z-index: 0;
+  z-index: -2;
   opacity: 0.3;
+  pointer-events: none;
 }
 
 .background-overlay {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
   background: linear-gradient(to bottom, rgba(11, 15, 25, 0.4) 0%, rgba(11, 15, 25, 0.95) 100%);
-  z-index: 1;
+  z-index: -1;
   pointer-events: none;
 }
 
 .hero {
   position: relative;
-  z-index: 2;
+  z-index: 1;
   text-align: center;
   padding: var(--spacing-xl) var(--spacing-md);
   padding-top: 100px;
@@ -75,6 +78,6 @@ import backgroundImage from '@/assets/Hintergrund.webp'
 
 :deep(.timeline-container) {
   position: relative;
-  z-index: 2;
+  z-index: 1;
 }
 </style>
