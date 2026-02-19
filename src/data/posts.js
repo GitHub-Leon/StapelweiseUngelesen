@@ -1,77 +1,37 @@
 export const posts = [
   {
-    id: '1',
-    type: 'rezension', // review -> rezension
-    title: 'Die Mitternachtsbibliothek',
-    author: 'Matt Haig',
-    date: '2023-10-15',
-    coverImage: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=800', 
-    summary: ' Ein Roman über all die Leben, die man hätte leben können.',
-    content: `
-      <p>Zwischen Leben und Tod gibt es eine Bibliothek, und in dieser Bibliothek reichen die Regale bis in die Unendlichkeit. Jedes Buch bietet die Chance, ein anderes Leben auszuprobieren. Zu sehen, wie die Dinge gelaufen wären, hätte man andere Entscheidungen getroffen... Würdest du etwas anders machen, wenn du die Chance hättest, deine Reue ungeschehen zu machen?</p>
-      <h3>Was mir gefallen hat</h3>
-      <ul>
-        <li>Das Konzept ist unglaublich einzigartig und regt zum Nachdenken an.</li>
-        <li>Die Charakterentwicklung von Nora wirkte sehr authentisch.</li>
-      </ul>
-      <h3>Was mir nicht gefallen hat</h3>
-      <ul>
-        <li>Einige der alternativen Leben fühlten sich etwas überhastet an.</li>
-      </ul>
-    `,
-    rating: 4.5,
-    likes: 120,
-    dislikes: 5
-  },
-  {
-    id: '2',
+    id: 'burning-crown',
     type: 'rezension',
-    title: 'Der Astronaut',
-    author: 'Andy Weir',
-    date: '2023-09-28',
-    coverImage: 'https://images.unsplash.com/photo-1581822261290-991b38693d1b?q=80&w=2070',
-    summary: 'Ein einsamer Astronaut muss die Erde vor einer Katastrophe retten.',
+    title: 'Burning Crown',
+    author: 'Marie Niehoff',
+    date: '2026-02-19',
+    coverImage: '/images/posts/burning-crown/cover.png',
+    extraImages: [
+      '/images/posts/burning-crown/bild-1.png',
+      '/images/posts/burning-crown/bild-2.png',
+    ],
+    summary:
+      'Eine leicht zug\u00e4ngliche Romantasy mit starkem Romance-Fokus, sympathischen Figuren und kleinen Schw\u00e4chen beim Worldbuilding.',
     content: `
-      <p>Ryland Grace ist der einzige Überlebende einer verzweifelten Mission – und wenn er scheitert, werden die Menschheit und die Erde selbst untergehen. Nur weiß er das im Moment noch nicht. Er kann sich nicht einmal an seinen eigenen Namen erinnern, geschweige denn an die Art seines Auftrags oder wie er ihn erfüllen soll.</p>
-      <h3>Was mir gefallen hat</h3>
-      <ul>
-        <li>Rocky! Bester Charakter überhaupt.</li>
-        <li>Die Wissenschaft wirkte zugänglich, aber dennoch clever.</li>
-      </ul>
-    `,
-    rating: 5,
-    likes: 250,
-    dislikes: 2
-  },
-  {
-    id: '3',
-    type: 'gedanken', // thought -> gedanken
-    title: 'Warum ich physische Bücher bevorzuge',
-    date: '2023-09-05',
-    coverImage: 'https://images.unsplash.com/photo-1524578271613-d550eacf6090?auto=format&fit=crop&q=80&w=800',
-    summary: 'Es hat etwas Besonderes, Papier zu riechen, das Digitales einfach nicht ersetzen kann.',
-    content: `
-      <p>In einem Zeitalter, in dem alles digital wird, stelle ich fest, dass ich mehr denn je an physischen Büchern hänge. Das haptische Erlebnis beim Umblättern, der Geruch des Papiers, das Gewicht des Buches in meiner Hand – all das trägt zum Leseerlebnis bei.</p>
-      <p>Versteh mich nicht falsch, E-Reader sind praktisch. Aber ihnen fehlt die Seele eines echten Buches.</p>
-    `,
-    rating: null,
-    likes: 89,
-    dislikes: 12
-  },
-  {
-    id: '4',
-    type: 'rezension',
-    title: 'Yellowface',
-    author: 'R.F. Kuang',
-    date: '2023-08-12',
-    coverImage: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&q=80&w=800',
-    summary: 'Ein satirischer Thriller über die Verlagsbranche.',
-    content: `
-      <p>June Hayward und Athena Liu sollten eigentlich Zwillingsstars sein: gleicher Jahrgang in Yale, gleiches Debütjahr. Aber Athena ist ein Liebling der Literaturszene, während June nicht einmal als Taschenbuch veröffentlicht wurde.</p>
-      <p>Als June Athenas Tod bei einem bizarren Unfall miterlebt, handelt sie impulsiv: Sie stiehlt Athenas gerade fertiggestelltes Meisterwerk, einen experimentellen Roman über die unbesungenen Beiträge chinesischer Arbeiter während des Ersten Weltkriegs.</p>
+      <p>Ehrlich, weil ich noch so ein Neuling bin und grunds\u00e4tzlich nie so dar\u00fcber nachdenke, ob mir das Buch, das ich gerade gelesen habe, jetzt wirklich gefallen hat oder nicht, f\u00e4llt es mir auch schwer, dieses Buch genauestens einzuordnen.</p>
+
+      <p><strong>Kurze Inhaltsangabe:</strong> Captain Yessa Hayes ist klar: Liebe zwischen Drachen und Drachenreitern bedeutet den Tod. Das verbotene Knistern zwischen ihr und ihrem rebellischen Drachen Cassim l\u00e4sst sich allerdings nicht lange unterdr\u00fccken. Doch Cassim ist nicht der, der er zu sein scheint - die Wahrheit k\u00f6nnte sie beide vernichten.</p>
+
+      <p>In meinem Book Journal habe ich es mit 4/5 Sternen bewertet (bewerte B\u00fccher nach Unterhaltungsfaktor). Ich meine, jedes Buch, das ich fertig lese, kann schon mal nicht so schlecht sein. Au\u00dferdem hat es mich echt toll unterhalten und gefesselt. Deshalb w\u00fcrde ich es vor allem auch Fantasy-/Romantasy-Neulingen empfehlen. Es konzentriert sich eher auf Romance als auf High Fantasy, es ist leicht und verst\u00e4ndlich geschrieben und hat sympathische Charaktere. Ich gehe jetzt noch genauer auf die einzelnen Aspekte ein.</p>
+
+      <p><strong>Achtung vor kleinen Spoilern.</strong></p>
+
+      <h3>CHARAKTERE</h3>
+      <p>Ich fand sowohl Cassim als auch Yessa sympathisch. Aber ehrlich, ich bin da auch echt nicht so kritisch. Yessa ist extrem naiv und ich habe mich im Buch auch teilweise gefragt, wie sie es mit der rebellischen Einstellung und den teilweise \u00fcberst\u00fcrzten Entscheidungen \u00fcberhaupt bis zur Position eines Captains geschafft hat. Cassim hat sooo viele Geheimnisse, die ich ihm (w\u00e4re ich Yessa) einfach nicht vergeben k\u00f6nnte. Deshalb bin ich gespannt, wie das im 2. Teil (und Teil 3) gekl\u00e4rt wird.</p>
+
+      <h3>WORLDBUILDING</h3>
+      <p>Es ist keine High Fantasy. Wenn du eine krasse Weltausarbeitung (wie bei Herr der Ringe, Game of Thrones, Fourth Wing) erwartest, dann wirst du entt\u00e4uscht werden. (Vielleicht \u00e4ndert sich das mit den n\u00e4chsten Teilen ja noch.) Eldeya ist eine faszinierende Welt, die allerdings sehr blass ist. Der Fokus liegt einfach nicht auf der Welt, sondern auf den Charakteren und der Liebesgeschichte. Genau das macht das Buch aber auch so leicht zum Weglesen.</p>
+
+      <h3>FAZIT</h3>
+      <p>Wenn du nach einer sch\u00f6nen Liebesgeschichte in einer grausamen Welt suchst, dann bist du bei Burning Crown richtig. Wenn du noch Fantasybuch-Anf\u00e4nger bist, auch. Wenn du auf Slow Burn mit krassem Worldbuilding stehst - gib dem Buch trotzdem eine Chance!</p>
     `,
     rating: 4,
-    likes: 150,
-    dislikes: 10
-  }
-];
+    likes: 0,
+    dislikes: 0,
+  },
+]

@@ -5,15 +5,24 @@
   <div class="about-container">
     <div class="profile-section">
       <div class="about-content">
-        <h1>Über mich</h1>
+        <h1>Willkommen bei Stapelweise Ungelesen!</h1>
         <p class="intro">
-          Willkommen bei Stapelweise Ungelesen!
+          Ich liebe Bücher - schon immer. Aber: Zwischen Alltag und dem endlosen Scrollen auf Social Media ist es manchmal verdammt schwer, am Ball zu bleiben.
         </p>
         <p>
-          Ich war schon immer von Bücherstapeln umgeben. Einige gelesen, viele warten geduldig. Dieser Blog ist meine Art, diese Reise zu dokumentieren, meine Gedanken zu den Seiten zu teilen, die mich bewegen, und dich vielleicht dazu zu ermutigen, etwas Neues in die Hand zu nehmen.
+          Dieser Blog ist mein persönliches Projekt, um mehr zu lesen. Er ist meine Motivation, wieder tiefer in Geschichten einzutauchen egal, ob es ein Klassiker oder Romantasy ist.
+        </p>
+        <p class="section-title">
+          Was dich hier erwartet:
         </p>
         <p>
-          Hier findest du Rezensionen, literarische Streifzüge und einen Katalog meines Leselebens.
+          <strong>Ehrliche Gedanken:</strong> Ich schreibe über das, was mich bewegt ohne Filter, einfach aus Spaß.
+        </p>
+        <p>
+          <strong>Visuelle Welten:</strong> Da ich es liebe, mit KI-Tools zu experimentieren, erstelle ich zu meinen gelesenen Büchern eigene Bilder. So werden die Welten aus meinem Kopf direkt für dich sichtbar.
+        </p>
+        <p>
+          Schön, dass du da bist. Lass uns gemeinsam den Stapel kleiner machen!
         </p>
       </div>
     </div>
@@ -38,7 +47,7 @@
   flex: 1;
   min-width: 300px;
   /* Centering text if no image is present can look nice */
-  text-align: center; 
+  text-align: center;
 }
 
 h1 {
@@ -56,5 +65,12 @@ p {
   font-size: 1.25rem;
   color: var(--color-text-primary);
   font-weight: 500;
+}
+
+.section-title {
+  font-size: 1.2rem;
+  color: var(--color-text-primary);
+  font-weight: 600;
+  margin-top: var(--spacing-md);
 }
 </style>
