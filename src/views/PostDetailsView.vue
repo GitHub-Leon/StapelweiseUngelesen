@@ -1,22 +1,13 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { posts } from '../data/posts.js'
+import { getPostById } from '../data/posts/index.js'
 import { useMouseSpotlight } from '../composables/useMouseSpotlight.js'
 
 const route = useRoute()
-
-const post = ref(null)
-const likesCount = ref(0)
-const hasLiked = ref(false)
-const isSyncingLike = ref(false)
-const likeNotice = ref('')
-
-const REACTIONS_ENDPOINT = '/api/reactions'
-const LIKE_STORAGE_PREFIX = 'reaction_like_'
-const LIKE_COUNT_STORAGE_PREFIX = 'reaction_likes_'
-
 const { spotlightStyle, onSpotlightMove, onSpotlightLeave } = useMouseSpotlight()
+
+const post = computed(() => getPostById(String(route.params.id ?? '')))
 
 const formattedDate = computed(() => {
   if (!post.value) return ''
@@ -27,156 +18,8 @@ const formattedDate = computed(() => {
   })
 })
 
-const galleryImages = computed(() => {
-  if (!post.value?.extraImages) return []
-  return post.value.extraImages
-})
-
+const galleryImages = computed(() => post.value?.extraImages ?? [])
 const floatingImages = computed(() => galleryImages.value.slice(0, 2))
-
-const toSafeCount = (value, fallback = 0) => {
-  const numeric = Number(value)
-  if (!Number.isFinite(numeric) || numeric < 0) return Math.max(0, Math.trunc(fallback))
-  return Math.trunc(numeric)
-}
-
-const getLikeStorageKey = (postId) => `${LIKE_STORAGE_PREFIX}${postId}`
-const getLikeCountStorageKey = (postId) => `${LIKE_COUNT_STORAGE_PREFIX}${postId}`
-
-const readStoredLikeState = (postId) => {
-  try {
-    return localStorage.getItem(getLikeStorageKey(postId)) === 'true'
-  } catch {
-    return false
-  }
-}
-
-const persistLikeState = (postId, liked) => {
-  try {
-    localStorage.setItem(getLikeStorageKey(postId), liked ? 'true' : 'false')
-  } catch {
-    // no-op
-  }
-}
-
-const readStoredLikes = (postId) => {
-  try {
-    const raw = localStorage.getItem(getLikeCountStorageKey(postId))
-    if (!raw) return null
-    return toSafeCount(raw, 0)
-  } catch {
-    return null
-  }
-}
-
-const persistLikes = (postId, likes) => {
-  try {
-    localStorage.setItem(getLikeCountStorageKey(postId), String(toSafeCount(likes, 0)))
-  } catch {
-    // no-op
-  }
-}
-
-const loadPost = async () => {
-  const foundPost = posts.find((entry) => entry.id === route.params.id)
-  if (!foundPost) {
-    post.value = null
-    return
-  }
-
-  post.value = { ...foundPost }
-  likeNotice.value = ''
-
-  const baseLikes = toSafeCount(post.value.likes, 0)
-  const cachedLikes = readStoredLikes(post.value.id)
-
-  likesCount.value = cachedLikes ?? baseLikes
-  hasLiked.value = readStoredLikeState(post.value.id)
-
-  await fetchRemoteLikes()
-}
-
-const fetchRemoteLikes = async () => {
-  if (!post.value) return
-
-  const params = new URLSearchParams({
-    postId: post.value.id,
-    likes: String(likesCount.value),
-  })
-
-  try {
-    const response = await fetch(`${REACTIONS_ENDPOINT}?${params.toString()}`, {
-      cache: 'no-store',
-    })
-    if (!response.ok) throw new Error(`HTTP ${response.status}`)
-
-    const data = await response.json()
-    likesCount.value = toSafeCount(data.likes, likesCount.value)
-    persistLikes(post.value.id, likesCount.value)
-  } catch (error) {
-    console.warn('Could not load remote likes, using local fallback.', error)
-  }
-}
-
-const syncLike = async (nextLiked) => {
-  if (!post.value || isSyncingLike.value) return
-
-  const previousLiked = hasLiked.value
-  if (previousLiked === nextLiked) return
-
-  const originalLikes = likesCount.value
-  likesCount.value = Math.max(0, originalLikes + (nextLiked ? 1 : -1))
-  hasLiked.value = nextLiked
-  persistLikeState(post.value.id, hasLiked.value)
-  persistLikes(post.value.id, likesCount.value)
-  likeNotice.value = ''
-
-  isSyncingLike.value = true
-
-  try {
-    const response = await fetch(REACTIONS_ENDPOINT, {
-      method: 'POST',
-      cache: 'no-store',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        postId: post.value.id,
-        previousLiked,
-        nextLiked,
-        fallbackLikes: originalLikes,
-      }),
-    })
-
-    if (!response.ok) throw new Error(`HTTP ${response.status}`)
-
-    const data = await response.json()
-    likesCount.value = toSafeCount(data.likes, likesCount.value)
-    hasLiked.value = Boolean(data.userLiked)
-
-    persistLikeState(post.value.id, hasLiked.value)
-    persistLikes(post.value.id, likesCount.value)
-  } catch (error) {
-    if (!import.meta.env.DEV) {
-      likeNotice.value = 'Server nicht erreichbar. Reaktion nur lokal gespeichert.'
-    }
-    console.warn('Could not sync like to backend.', error)
-  } finally {
-    isSyncingLike.value = false
-  }
-}
-
-const toggleLike = () => {
-  syncLike(!hasLiked.value)
-}
-
-watch(
-  () => route.params.id,
-  async () => {
-    await loadPost()
-  },
-  { immediate: true },
-)
 </script>
 
 <template>
@@ -236,23 +79,6 @@ watch(
           </figure>
         </div>
       </section>
-
-      <div class="engagement">
-        <div class="engagement-actions">
-          <button
-            class="reaction-button like"
-            :class="{ active: hasLiked }"
-            :disabled="isSyncingLike"
-            @click="toggleLike"
-          >
-            <span class="reaction-icon" aria-hidden="true">&#9829;</span>
-            <span class="count">{{ likesCount }}</span>
-            <span class="label">{{ hasLiked ? 'Like entfernen' : 'Gefällt mir' }}</span>
-          </button>
-        </div>
-
-        <p v-if="likeNotice" class="reaction-notice">{{ likeNotice }}</p>
-      </div>
     </div>
   </div>
 
@@ -423,64 +249,6 @@ watch(
   max-height: 320px;
   object-fit: cover;
   display: block;
-}
-
-.engagement {
-  margin-top: var(--spacing-xl);
-  padding-top: var(--spacing-md);
-  border-top: 1px solid var(--color-border);
-}
-
-.engagement-actions {
-  display: flex;
-  justify-content: center;
-}
-
-.reaction-button {
-  background: var(--color-surface);
-  border: 2px solid var(--color-border);
-  padding: 10px 18px;
-  border-radius: 999px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 1rem;
-  transition: all 0.25s ease;
-  color: var(--color-text-secondary);
-}
-
-.reaction-button:hover:not(:disabled) {
-  transform: translateY(-2px);
-}
-
-.reaction-button:disabled {
-  opacity: 0.7;
-  cursor: wait;
-}
-
-.reaction-button.like.active {
-  background-color: var(--color-accent-warm);
-  border-color: var(--color-accent-warm);
-  color: white;
-}
-
-.reaction-icon {
-  font-size: 1.1rem;
-  line-height: 1;
-}
-
-.count {
-  min-width: 1.5ch;
-  font-weight: 700;
-  text-align: center;
-}
-
-.reaction-notice {
-  margin-top: var(--spacing-sm);
-  text-align: center;
-  color: var(--color-text-secondary);
-  font-size: 0.9rem;
 }
 
 .not-found {

@@ -42,3 +42,11 @@ npm run build
 ```sh
 npm run lint
 ```
+
+## Blog posts
+
+Posts are defined in `src/data/posts/`.
+
+- Each post has its own file (example: `src/data/posts/burning-crown.js`).
+- `src/data/posts/index.js` is the single registry that exports all posts.
+- Use `src/data/posts/README.md` as the template/checklist when adding a new post.

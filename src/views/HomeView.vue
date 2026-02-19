@@ -1,6 +1,6 @@
 <script setup>
 import Timeline from '../components/Timeline.vue'
-import { posts } from '../data/posts.js'
+import { posts } from '../data/posts/index.js'
 import backgroundImage from '@/assets/Hintergrund.webp'
 </script>
 

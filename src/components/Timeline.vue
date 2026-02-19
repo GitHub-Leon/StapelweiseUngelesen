@@ -10,24 +10,26 @@ const props = defineProps({
 })
 
 const groupedPosts = computed(() => {
-  const groups = {}
-  
-  const sorted = [...props.posts].sort((a, b) => new Date(b.date) - new Date(a.date))
+  const groups = []
+  const groupsByKey = new Map()
 
-  sorted.forEach(post => {
+  props.posts.forEach((post) => {
     const date = new Date(post.date)
-    const key = `${date.getFullYear()}-${date.getMonth()}` 
-    
-    if (!groups[key]) {
-      groups[key] = {
+    const key = `${date.getFullYear()}-${date.getMonth()}`
+
+    if (!groupsByKey.has(key)) {
+      const group = {
         label: date.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' }),
-        posts: []
+        posts: [],
       }
+      groupsByKey.set(key, group)
+      groups.push(group)
     }
-    groups[key].posts.push(post)
+
+    groupsByKey.get(key).posts.push(post)
   })
 
-  return Object.values(groups)
+  return groups
 })
 </script>
 
