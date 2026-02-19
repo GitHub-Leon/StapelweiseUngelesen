@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { posts } from '../data/posts.js'
+import { useMouseSpotlight } from '../composables/useMouseSpotlight.js'
 
 const route = useRoute()
 
@@ -14,6 +15,8 @@ const likeNotice = ref('')
 const REACTIONS_ENDPOINT = '/api/reactions'
 const LIKE_STORAGE_PREFIX = 'reaction_like_'
 const LIKE_COUNT_STORAGE_PREFIX = 'reaction_likes_'
+
+const { spotlightStyle, onSpotlightMove, onSpotlightLeave } = useMouseSpotlight()
 
 const formattedDate = computed(() => {
   if (!post.value) return ''
@@ -28,6 +31,8 @@ const galleryImages = computed(() => {
   if (!post.value?.extraImages) return []
   return post.value.extraImages
 })
+
+const floatingImages = computed(() => galleryImages.value.slice(0, 2))
 
 const toSafeCount = (value, fallback = 0) => {
   const numeric = Number(value)
@@ -175,7 +180,15 @@ watch(
 </script>
 
 <template>
-  <div v-if="post" class="post-details">
+  <div
+    v-if="post"
+    class="post-details spotlight-host"
+    :style="spotlightStyle"
+    @pointermove="onSpotlightMove"
+    @pointerleave="onSpotlightLeave"
+  >
+    <div class="mouse-spotlight" aria-hidden="true"></div>
+
     <div class="post-header">
       <div class="header-content">
         <div class="meta">
@@ -202,9 +215,20 @@ watch(
     </div>
 
     <div class="content-wrapper">
+      <aside v-if="floatingImages.length" class="floating-visuals" aria-hidden="true">
+        <figure
+          v-for="(image, index) in floatingImages"
+          :key="`floating-${index}-${image}`"
+          class="floating-card"
+          :class="`card-${index}`"
+        >
+          <img :src="image" :alt="''" loading="lazy" />
+        </figure>
+      </aside>
+
       <article class="post-content" v-html="post.content"></article>
 
-      <section v-if="galleryImages.length" class="post-gallery">
+      <section v-if="galleryImages.length" class="post-gallery mobile-gallery">
         <h3 class="gallery-title">Impressionen</h3>
         <div class="gallery-grid">
           <figure v-for="(image, index) in galleryImages" :key="image" class="gallery-item">
@@ -242,6 +266,35 @@ watch(
 .post-details {
   background-color: var(--color-background);
   min-height: 100vh;
+}
+
+.spotlight-host {
+  position: relative;
+  isolation: isolate;
+  overflow-x: clip;
+}
+
+.mouse-spotlight {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: calc(var(--spotlight-opacity, 0) * 0.58);
+  background: radial-gradient(
+    260px circle at var(--spotlight-x, 50%) var(--spotlight-y, 35%),
+    rgba(255, 255, 255, 0.065),
+    rgba(255, 255, 255, 0.02) 35%,
+    transparent 70%
+  );
+  transition: opacity 180ms ease;
+}
+
+.post-header,
+.post-image-container,
+.floating-visuals,
+.content-wrapper {
+  position: relative;
+  z-index: 1;
 }
 
 .post-header {
@@ -304,7 +357,6 @@ watch(
   width: 100%;
   height: 400px;
   overflow: hidden;
-  position: relative;
 }
 
 .post-hero-image {
@@ -335,6 +387,10 @@ watch(
   margin-top: var(--spacing-lg);
   margin-bottom: var(--spacing-sm);
   color: var(--color-text-primary);
+}
+
+.floating-visuals {
+  display: none;
 }
 
 .post-gallery {
@@ -432,6 +488,65 @@ watch(
   padding: var(--spacing-xl);
 }
 
+@media (min-width: 1280px) {
+  .floating-visuals {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .floating-card {
+    position: absolute;
+    width: min(17vw, 15rem);
+    aspect-ratio: 4 / 5;
+    border-radius: 1.2rem;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: rgba(18, 24, 36, 0.55);
+    backdrop-filter: blur(8px) saturate(1.1);
+    box-shadow:
+      0 26px 60px rgba(0, 0, 0, 0.45),
+      0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+  }
+
+  .floating-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      170deg,
+      rgba(255, 255, 255, 0.18),
+      transparent 35%,
+      rgba(0, 0, 0, 0.24)
+    );
+  }
+
+  .floating-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(1.08) contrast(1.02);
+  }
+
+  .floating-card.card-0 {
+    top: clamp(3rem, 5vw, 4.5rem);
+    right: calc(100% + clamp(1rem, 2.4vw, 2rem));
+    transform: rotate(-6deg);
+  }
+
+  .floating-card.card-1 {
+    bottom: clamp(4rem, 7vw, 6.5rem);
+    left: calc(100% + clamp(1rem, 2.4vw, 2rem));
+    transform: rotate(6deg);
+  }
+
+  .mobile-gallery {
+    display: none;
+  }
+}
+
 @media (max-width: 768px) {
   .title {
     font-size: 2.2rem;
@@ -439,6 +554,10 @@ watch(
 
   .gallery-grid {
     grid-template-columns: 1fr;
+  }
+
+  .mouse-spotlight {
+    display: none;
   }
 }
 </style>

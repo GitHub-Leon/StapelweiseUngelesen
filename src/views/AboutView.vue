@@ -1,7 +1,19 @@
-<script setup></script>
+﻿<script setup>
+import { useMouseSpotlight } from '../composables/useMouseSpotlight.js'
+
+const { spotlightStyle, onSpotlightMove, onSpotlightLeave } = useMouseSpotlight()
+</script>
 
 <template>
-  <section class="about-container" aria-labelledby="about-title">
+  <section
+    class="about-container spotlight-host"
+    aria-labelledby="about-title"
+    :style="spotlightStyle"
+    @pointermove="onSpotlightMove"
+    @pointerleave="onSpotlightLeave"
+  >
+    <div class="mouse-spotlight" aria-hidden="true"></div>
+
     <article class="about-content">
       <h1 id="about-title">Willkommen bei Stapelweise Ungelesen!</h1>
 
@@ -41,7 +53,30 @@
   padding: clamp(2rem, 4vw, 4rem) clamp(1rem, 3vw, 2rem);
 }
 
+.spotlight-host {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+}
+
+.mouse-spotlight {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: var(--spotlight-opacity, 0);
+  background: radial-gradient(
+    220px circle at var(--spotlight-x, 50%) var(--spotlight-y, 30%),
+    rgba(255, 255, 255, 0.09),
+    rgba(255, 255, 255, 0.025) 34%,
+    transparent 72%
+  );
+  transition: opacity 180ms ease;
+}
+
 .about-content {
+  position: relative;
+  z-index: 1;
   max-width: 66ch;
   margin-inline: auto;
   text-align: left;
@@ -90,6 +125,10 @@ p {
 @media (max-width: 768px) {
   .about-content {
     max-width: 62ch;
+  }
+
+  .mouse-spotlight {
+    display: none;
   }
 }
 </style>
