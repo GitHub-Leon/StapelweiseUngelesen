@@ -5,10 +5,10 @@ export const posts = [
     title: 'Burning Crown',
     author: 'Marie Niehoff',
     date: '2026-02-19',
-    coverImage: '/images/posts/burning-crown/cover.png',
+    coverImage: '/images/posts/burning-crown/cover.webp',
     extraImages: [
-      '/images/posts/burning-crown/bild-1.png',
-      '/images/posts/burning-crown/bild-2.png',
+      '/images/posts/burning-crown/bild-1.webp',
+      '/images/posts/burning-crown/bild-2.webp',
     ],
     summary:
       'Eine leicht zug\u00e4ngliche Romantasy mit starkem Romance-Fokus, sympathischen Figuren und kleinen Schw\u00e4chen beim Worldbuilding.',
@@ -32,6 +32,5 @@ export const posts = [
     `,
     rating: 4,
     likes: 0,
-    dislikes: 0,
   },
 ]

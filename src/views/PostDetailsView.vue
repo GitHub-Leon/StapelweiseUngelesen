@@ -6,14 +6,14 @@ import { posts } from '../data/posts.js'
 const route = useRoute()
 
 const post = ref(null)
-const reactionCounts = ref({ likes: 0, dislikes: 0 })
-const userReaction = ref('none')
-const isSyncingReaction = ref(false)
-const reactionNotice = ref('')
+const likesCount = ref(0)
+const hasLiked = ref(false)
+const isSyncingLike = ref(false)
+const likeNotice = ref('')
 
 const REACTIONS_ENDPOINT = '/api/reactions'
-const REACTION_STORAGE_PREFIX = 'reaction_vote_'
-const COUNTS_STORAGE_PREFIX = 'reaction_counts_'
+const LIKE_STORAGE_PREFIX = 'reaction_like_'
+const LIKE_COUNT_STORAGE_PREFIX = 'reaction_likes_'
 
 const formattedDate = computed(() => {
   if (!post.value) return ''
@@ -29,98 +29,46 @@ const galleryImages = computed(() => {
   return post.value.extraImages
 })
 
-const isLiked = computed(() => userReaction.value === 'like')
-const isDisliked = computed(() => userReaction.value === 'dislike')
-
-const normalizeReaction = (value) => {
-  if (value === 'like' || value === 'dislike') return value
-  return 'none'
-}
-
 const toSafeCount = (value, fallback = 0) => {
   const numeric = Number(value)
   if (!Number.isFinite(numeric) || numeric < 0) return Math.max(0, Math.trunc(fallback))
   return Math.trunc(numeric)
 }
 
-const getBaseCounts = () => ({
-  likes: toSafeCount(post.value?.likes, 0),
-  dislikes: toSafeCount(post.value?.dislikes, 0),
-})
+const getLikeStorageKey = (postId) => `${LIKE_STORAGE_PREFIX}${postId}`
+const getLikeCountStorageKey = (postId) => `${LIKE_COUNT_STORAGE_PREFIX}${postId}`
 
-const getReactionStorageKey = (postId) => `${REACTION_STORAGE_PREFIX}${postId}`
-const getCountsStorageKey = (postId) => `${COUNTS_STORAGE_PREFIX}${postId}`
-
-const readStoredReaction = (postId) => {
+const readStoredLikeState = (postId) => {
   try {
-    return normalizeReaction(localStorage.getItem(getReactionStorageKey(postId)))
+    return localStorage.getItem(getLikeStorageKey(postId)) === 'true'
   } catch {
-    return 'none'
+    return false
   }
 }
 
-const persistStoredReaction = (postId, reaction) => {
+const persistLikeState = (postId, liked) => {
   try {
-    localStorage.setItem(getReactionStorageKey(postId), normalizeReaction(reaction))
+    localStorage.setItem(getLikeStorageKey(postId), liked ? 'true' : 'false')
   } catch {
     // no-op
   }
 }
 
-const readStoredCounts = (postId) => {
+const readStoredLikes = (postId) => {
   try {
-    const raw = localStorage.getItem(getCountsStorageKey(postId))
+    const raw = localStorage.getItem(getLikeCountStorageKey(postId))
     if (!raw) return null
-    const parsed = JSON.parse(raw)
-    return {
-      likes: toSafeCount(parsed.likes, 0),
-      dislikes: toSafeCount(parsed.dislikes, 0),
-    }
+    return toSafeCount(raw, 0)
   } catch {
     return null
   }
 }
 
-const persistStoredCounts = (postId, counts) => {
+const persistLikes = (postId, likes) => {
   try {
-    localStorage.setItem(
-      getCountsStorageKey(postId),
-      JSON.stringify({
-        likes: toSafeCount(counts.likes, 0),
-        dislikes: toSafeCount(counts.dislikes, 0),
-      }),
-    )
+    localStorage.setItem(getLikeCountStorageKey(postId), String(toSafeCount(likes, 0)))
   } catch {
     // no-op
-  }
-}
-
-const setReactionCounts = (likes, dislikes) => {
-  reactionCounts.value = {
-    likes: toSafeCount(likes, 0),
-    dislikes: toSafeCount(dislikes, 0),
-  }
-}
-
-const applyTransition = (counts, previousReaction, nextReaction) => {
-  let likes = toSafeCount(counts.likes, 0)
-  let dislikes = toSafeCount(counts.dislikes, 0)
-
-  const previous = normalizeReaction(previousReaction)
-  const next = normalizeReaction(nextReaction)
-
-  if (previous === next) {
-    return { likes, dislikes }
-  }
-
-  if (previous === 'like') likes -= 1
-  if (previous === 'dislike') dislikes -= 1
-  if (next === 'like') likes += 1
-  if (next === 'dislike') dislikes += 1
-
-  return {
-    likes: Math.max(0, likes),
-    dislikes: Math.max(0, dislikes),
   }
 }
 
@@ -132,25 +80,23 @@ const loadPost = async () => {
   }
 
   post.value = { ...foundPost }
-  reactionNotice.value = ''
+  likeNotice.value = ''
 
-  const baseCounts = getBaseCounts()
-  const cachedCounts = readStoredCounts(post.value.id)
-  const initialCounts = cachedCounts ?? baseCounts
+  const baseLikes = toSafeCount(post.value.likes, 0)
+  const cachedLikes = readStoredLikes(post.value.id)
 
-  setReactionCounts(initialCounts.likes, initialCounts.dislikes)
-  userReaction.value = readStoredReaction(post.value.id)
+  likesCount.value = cachedLikes ?? baseLikes
+  hasLiked.value = readStoredLikeState(post.value.id)
 
-  await fetchRemoteCounts()
+  await fetchRemoteLikes()
 }
 
-const fetchRemoteCounts = async () => {
+const fetchRemoteLikes = async () => {
   if (!post.value) return
 
   const params = new URLSearchParams({
     postId: post.value.id,
-    likes: String(reactionCounts.value.likes),
-    dislikes: String(reactionCounts.value.dislikes),
+    likes: String(likesCount.value),
   })
 
   try {
@@ -158,32 +104,27 @@ const fetchRemoteCounts = async () => {
     if (!response.ok) throw new Error(`HTTP ${response.status}`)
 
     const data = await response.json()
-    setReactionCounts(data.likes, data.dislikes)
-    persistStoredCounts(post.value.id, reactionCounts.value)
+    likesCount.value = toSafeCount(data.likes, likesCount.value)
+    persistLikes(post.value.id, likesCount.value)
   } catch (error) {
-    // Local fallback remains active when function endpoint is unavailable.
-    console.warn('Could not load remote reactions, using local fallback.', error)
+    console.warn('Could not load remote likes, using local fallback.', error)
   }
 }
 
-const syncReaction = async (nextReaction) => {
-  if (!post.value || isSyncingReaction.value) return
+const syncLike = async (nextLiked) => {
+  if (!post.value || isSyncingLike.value) return
 
-  const next = normalizeReaction(nextReaction)
-  const previous = userReaction.value
+  const previousLiked = hasLiked.value
+  if (previousLiked === nextLiked) return
 
-  if (previous === next) return
+  const originalLikes = likesCount.value
+  likesCount.value = Math.max(0, originalLikes + (nextLiked ? 1 : -1))
+  hasLiked.value = nextLiked
+  persistLikeState(post.value.id, hasLiked.value)
+  persistLikes(post.value.id, likesCount.value)
+  likeNotice.value = ''
 
-  const originalCounts = { ...reactionCounts.value }
-  const optimisticCounts = applyTransition(originalCounts, previous, next)
-
-  setReactionCounts(optimisticCounts.likes, optimisticCounts.dislikes)
-  userReaction.value = next
-  persistStoredReaction(post.value.id, userReaction.value)
-  persistStoredCounts(post.value.id, reactionCounts.value)
-  reactionNotice.value = ''
-
-  isSyncingReaction.value = true
+  isSyncingLike.value = true
 
   try {
     const response = await fetch(REACTIONS_ENDPOINT, {
@@ -193,40 +134,32 @@ const syncReaction = async (nextReaction) => {
       },
       body: JSON.stringify({
         postId: post.value.id,
-        previousReaction: previous,
-        nextReaction: next,
-        fallbackLikes: originalCounts.likes,
-        fallbackDislikes: originalCounts.dislikes,
+        previousLiked,
+        nextLiked,
+        fallbackLikes: originalLikes,
       }),
     })
 
     if (!response.ok) throw new Error(`HTTP ${response.status}`)
 
     const data = await response.json()
-    setReactionCounts(data.likes, data.dislikes)
-    userReaction.value = normalizeReaction(data.userReaction)
+    likesCount.value = toSafeCount(data.likes, likesCount.value)
+    hasLiked.value = Boolean(data.userLiked)
 
-    persistStoredReaction(post.value.id, userReaction.value)
-    persistStoredCounts(post.value.id, reactionCounts.value)
+    persistLikeState(post.value.id, hasLiked.value)
+    persistLikes(post.value.id, likesCount.value)
   } catch (error) {
-    // Keep optimistic local state, but inform user persistence is local-only.
     if (!import.meta.env.DEV) {
-      reactionNotice.value = 'Server nicht erreichbar. Reaktion nur lokal gespeichert.'
+      likeNotice.value = 'Server nicht erreichbar. Reaktion nur lokal gespeichert.'
     }
-    console.warn('Could not sync reaction to backend.', error)
+    console.warn('Could not sync like to backend.', error)
   } finally {
-    isSyncingReaction.value = false
+    isSyncingLike.value = false
   }
 }
 
 const toggleLike = () => {
-  const next = isLiked.value ? 'none' : 'like'
-  syncReaction(next)
-}
-
-const toggleDislike = () => {
-  const next = isDisliked.value ? 'none' : 'dislike'
-  syncReaction(next)
+  syncLike(!hasLiked.value)
 }
 
 watch(
@@ -281,35 +214,24 @@ watch(
         <div class="engagement-actions">
           <button
             class="reaction-button like"
-            :class="{ active: isLiked }"
-            :disabled="isSyncingReaction"
+            :class="{ active: hasLiked }"
+            :disabled="isSyncingLike"
             @click="toggleLike"
           >
             <span class="reaction-icon" aria-hidden="true">&#9829;</span>
-            <span class="count">{{ reactionCounts.likes }}</span>
-            <span class="label">{{ isLiked ? 'Like entfernen' : 'Gefaellt mir' }}</span>
-          </button>
-
-          <button
-            class="reaction-button dislike"
-            :class="{ active: isDisliked }"
-            :disabled="isSyncingReaction"
-            @click="toggleDislike"
-          >
-            <span class="reaction-icon" aria-hidden="true">&#128078;</span>
-            <span class="count">{{ reactionCounts.dislikes }}</span>
-            <span class="label">{{ isDisliked ? 'Dislike entfernen' : 'Gefaellt mir nicht' }}</span>
+            <span class="count">{{ likesCount }}</span>
+            <span class="label">{{ hasLiked ? 'Like entfernen' : 'Gefällt mir' }}</span>
           </button>
         </div>
 
-        <p v-if="reactionNotice" class="reaction-notice">{{ reactionNotice }}</p>
+        <p v-if="likeNotice" class="reaction-notice">{{ likeNotice }}</p>
       </div>
     </div>
   </div>
 
   <div v-else class="not-found">
     <h1>Beitrag nicht gefunden</h1>
-    <router-link to="/">Zurueck zur Startseite</router-link>
+    <router-link to="/">Zurück zur Startseite</router-link>
   </div>
 </template>
 
@@ -412,16 +334,6 @@ watch(
   color: var(--color-text-primary);
 }
 
-.post-content :deep(ul) {
-  list-style: disc;
-  padding-left: var(--spacing-lg);
-  margin-bottom: var(--spacing-md);
-}
-
-.post-content :deep(li) {
-  margin-bottom: var(--spacing-xs);
-}
-
 .post-gallery {
   margin-top: var(--spacing-lg);
 }
@@ -462,9 +374,7 @@ watch(
 
 .engagement-actions {
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
-  gap: var(--spacing-sm);
 }
 
 .reaction-button {
@@ -493,12 +403,6 @@ watch(
 .reaction-button.like.active {
   background-color: var(--color-accent-warm);
   border-color: var(--color-accent-warm);
-  color: white;
-}
-
-.reaction-button.dislike.active {
-  background-color: #7f1d1d;
-  border-color: #7f1d1d;
   color: white;
 }
 
